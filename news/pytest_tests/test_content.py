@@ -4,6 +4,8 @@ from django.conf import settings
 from django.urls import reverse
 
 
+from news.forms import CommentForm
+
 # Количество новостей на главной странице — не более 10.
 @pytest.mark.django_db
 @pytest.mark.usefixtures('news_list')
