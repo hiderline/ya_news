@@ -6,14 +6,18 @@ from django.contrib.auth import get_user_model
 from django.test.client import Client
 from django.utils import timezone
 
+from news.forms import BAD_WORDS
 from news.models import Comment, News
 
 
 User = get_user_model()
 
 TEXT = 'Some text'
+NEW_TEXT = 'Another text'
 TITLE = 'News title'
+NEW_TITLE = 'Another title'
 COMMENT = 'Comment'
+NEW_COMMENT = 'New Comment'
 COMMENT_AMOUNT = 13
 
 @pytest.fixture
@@ -84,3 +88,15 @@ def comment_list(news, author):
         )
         comment.created = now + timedelta(hours=i)
         comment.save
+
+
+@pytest.fixture
+def comment_form_data():
+    return {
+        'text': NEW_COMMENT,
+    }
+
+
+@pytest.fixture
+def swear_word_data():
+    return {'text': f'{TEXT}, {BAD_WORDS[0]}'}
