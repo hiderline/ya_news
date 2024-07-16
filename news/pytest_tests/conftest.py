@@ -1,16 +1,20 @@
+from datetime import datetime, timedelta
 import pytest
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test.client import Client
+from django.utils import timezone
 
 from news.models import Comment, News
 
 
 User = get_user_model()
 
-SOME_TEXT = 'Some news text'
+TEXT = 'Some text'
 TITLE = 'News title'
-
+COMMENT = 'Comment'
+COMMENT_AMOUNT = 13
 
 @pytest.fixture
 def author(django_user_model):
@@ -40,7 +44,7 @@ def not_author_client(not_author):
 def news():
     news = News.objects.create(
         title=TITLE,
-        text=SOME_TEXT
+        text=TEXT
     )
     return news
 
@@ -50,7 +54,33 @@ def comment(author, news):
     comment = Comment.objects.create(
         news=news,
         author=author,
-        text=SOME_TEXT
+        text=TEXT
     )
     return comment
-    
+
+
+@pytest.fixture
+def news_list():
+    news_list = News.objects.bulk_create(
+        News(
+            title=f'{TITLE} #{i}',
+            text=f'{TEXT} of {TITLE} #{i}',
+            date=datetime.today() - timedelta(days=i)
+        )
+        for i in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1)
+    )
+    return news_list
+
+
+@pytest.fixture
+def comment_list(news, author):
+    now = timezone.now()
+
+    for i in range(COMMENT_AMOUNT):
+        comment = Comment.objects.create(
+            news=news,
+            author=author,
+            text=f'{COMMENT} #{i}'
+        )
+        comment.created = now + timedelta(hours=i)
+        comment.save
