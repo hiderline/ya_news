@@ -79,15 +79,17 @@ def news_list():
 @pytest.fixture
 def comment_list(news, author):
     now = timezone.now()
-
-    for i in range(COMMENT_AMOUNT):
-        comment = Comment.objects.create(
+    comment_list = [
+        Comment(
             news=news,
             author=author,
             text=f'{COMMENT} #{i}'
         )
-        comment.created = now + timedelta(hours=i)
-        comment.save
+        for i in range(COMMENT_AMOUNT)
+    ]
+    for i in range(len(comment_list)):
+        comment_list[i].created = now + timedelta(hours=i)
+    Comment.objects.bulk_create(comment_list)
 
 
 @pytest.fixture
