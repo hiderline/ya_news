@@ -1,6 +1,7 @@
+import random
 from datetime import datetime, timedelta
-import pytest
 
+import pytest
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test.client import Client
@@ -69,7 +70,7 @@ def news_list():
         News(
             title=f'{TITLE} #{i}',
             text=f'{TEXT} of {TITLE} #{i}',
-            date=datetime.today() - timedelta(days=i)
+            date=datetime.today() - timedelta(days=(i * random.random()))
         )
         for i in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1)
     )
@@ -79,17 +80,14 @@ def news_list():
 @pytest.fixture
 def comment_list(news, author):
     now = timezone.now()
-    comment_list = [
-        Comment(
+    for i in range(10):
+        comment = Comment.objects.create(
             news=news,
             author=author,
             text=f'{COMMENT} #{i}'
         )
-        for i in range(COMMENT_AMOUNT)
-    ]
-    for i in range(len(comment_list)):
-        comment_list[i].created = now + timedelta(hours=i)
-    Comment.objects.bulk_create(comment_list)
+        comment.created = now + timedelta(minutes=(i * random.random()))
+        comment.save()
 
 
 @pytest.fixture

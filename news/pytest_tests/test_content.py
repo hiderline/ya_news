@@ -26,6 +26,10 @@ def test_home_page_news_order(client):
     response = client.get(url)
     object_list = response.context['object_list']
     news_date_list = [news.date for news in object_list]
+
+    for i in range(len(news_date_list)):
+        print(news_date_list[i])
+
     sorted_date_list = sorted(news_date_list, reverse=True)
     assert sorted_date_list == news_date_list
 
@@ -39,6 +43,10 @@ def test_news_comment_order(client, news):
     response = client.get(url)
     news = response.context['news']
     comments = news.comment_set.all()
+
+    for i in range(len(comments)):
+        print(comments[i].created)
+
     timestamps = [comment.created for comment in comments]
     sorted_timestamps = sorted(timestamps)
     assert timestamps == sorted_timestamps
